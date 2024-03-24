@@ -23,8 +23,8 @@ AWS_S3_BUCKET_NAME = 'bucket_name'
 
 AWS_SQS_URL = 'development_AWS_SQS_URL'
 
-EMAIL_HOST_USER = 'puzztory@gmail.com'
-EMAIL_HOST_PASSWORD = 'tehorlvcuzxivawo'
+EMAIL_HOST_USER = 'test@gmail.com'
+EMAIL_HOST_PASSWORD = 'testtest'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 DATABASES = {
