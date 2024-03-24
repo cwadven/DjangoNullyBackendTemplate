@@ -20,6 +20,7 @@ jobs:
 
     - name: Set Safe Directory
       run: |
+        export HOME=$GITHUB_WORKSPACE
         git config --global --add safe.directory "${{ secrets.DEVELOPMENT_PROJECT_FILE_PATH }}"
 
     - name: Pull Development Branch
