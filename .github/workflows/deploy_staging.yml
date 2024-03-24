@@ -39,6 +39,11 @@ jobs:
         . ${{ secrets.DEVELOPMENT_PROJECT_FILE_PATH }}/venv/bin/activate && python ${{ secrets.DEVELOPMENT_PROJECT_FILE_PATH }}/manage.py migrate --noinput
       continue-on-error: true
 
+    - name: cronjob command update
+      run: |
+        . ${{ secrets.DEVELOPMENT_PROJECT_FILE_PATH }}/venv/bin/activate && fab2 update-crontab
+      continue-on-error: true
+
     - name: cronjob restart
       run: |
         cat ${{ secrets.DEVELOPMENT_PROJECT_FILE_PATH }}/command.cron | sudo crontab -
