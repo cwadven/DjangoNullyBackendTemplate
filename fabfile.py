@@ -94,4 +94,6 @@ def update_crontab(c):
     rendered = template.render(
         prefix_command=prefix_command,
     )
+    rendered += '\n'
+
     Path('command.cron').write_text(rendered)
