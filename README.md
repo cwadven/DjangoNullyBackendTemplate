@@ -198,6 +198,18 @@ AWS settings.
 "AWS_SQS_URL" Example: https://sqs.ap-northeast-2.amazonaws.com/1234/nully
 ----------------------------------------
 
+-----------------13---------------------
+- Input CRONTAB_PREFIX_COMMAND:
+----------------------------------------
+AWS settings.
+
+"CRONTAB_PREFIX_COMMAND" 
+Example:
+source venv/bin/activate && python manage.py
+or
+cd /app && newrelic-admin run-program python manage.py
+----------------------------------------
+
 # Define settings file
 # local, development, production
 export DJANGO_SETTINGS_MODULE=XXXX.settings.local
