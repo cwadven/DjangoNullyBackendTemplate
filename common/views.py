@@ -4,7 +4,6 @@ from common.common_utils import generate_pre_signed_url_info
 from common.consts import IMAGE_CONSTANCE_TYPES
 from common.dtos.request_dtos import GetPreSignedURLRequest
 from common.dtos.response_dtos import (
-    ConstanceDetailTypeResponse,
     ConstanceTypeResponse,
     GetPreSignedURLResponse,
     HealthCheckResponse,

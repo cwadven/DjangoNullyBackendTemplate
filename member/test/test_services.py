@@ -1,4 +1,3 @@
-from datetime import date
 from unittest.mock import patch
 
 from common.models import (

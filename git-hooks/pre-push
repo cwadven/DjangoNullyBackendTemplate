@@ -2,14 +2,20 @@
 
 current_branch=$(git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,')
 if [ "$current_branch" = "master" ]; then
-    latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
-    version_number=${latest_tag#v}
+    # 최신 태그를 가져오고, 태그가 없으면 기본 값을 설정합니다.
+    latest_tag=$(git describe --tags $(git rev-list --tags --max-count=1) 2>/dev/null)
+    if [ -z "$latest_tag" ]; then
+        version_number="0.0.0"
+    else
+        version_number=${latest_tag#v}
+    fi
+
     IFS='.' read -r major minor patch <<< "$version_number"
     new_patch=$((patch + 1))
     new_version="$major.$minor.$new_patch"
-    git tag -a "$new_version" -m "New release $new_version"
 
-    echo "Created new tag $new_version on master branch"
-
-    git push origin "$new_version" --no-verify
+    # 새로운 태그를 생성하고 푸시합니다.
+    git tag -a "v$new_version" -m "New release v$new_version"
+    echo "Created new tag v$new_version on master branch"
+    git push origin "v$new_version" --no-verify
 fi

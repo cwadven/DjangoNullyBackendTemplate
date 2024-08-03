@@ -1,11 +1,4 @@
-from unittest.mock import patch
-
-from common.dtos.helper_dtos import (
-    ConstanceDetailType,
-    ConstanceType,
-)
 from common.helpers.constance_helpers import (
-    CONSTANCE_TYPE_HELPER_MAPPER,
     ConstanceDetailTypeHelper,
     ConstanceTypeHelper,
 )
