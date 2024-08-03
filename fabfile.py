@@ -54,9 +54,7 @@ def generate_env(c):
             'HOST': _get_or_set_environment('DB_HOST'),
             'PORT': _get_or_set_environment('DB_PORT'),
             'TEST': {
-                'NAME': _get_or_set_environment('DB_TEST_NAME'),
-                'CHARSET': 'utf8',
-                'COLLATION': 'utf8_general_ci',
+                'NAME': _get_or_set_environment('DB_TEST_NAME')
             },
         },
         'EMAIL_HOST_USER': _get_or_set_environment('EMAIL_HOST_USER'),
