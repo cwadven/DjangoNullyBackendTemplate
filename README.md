@@ -396,11 +396,11 @@ tail -f /tmp/log/django_commands.log
 - **pre-push**: Push with master branch version tag
 
 ```
-# goto git hooks
+# Check the symbolic link
 cd .git/hooks
 
 # create symbolic link
-for hook_path in ~/{Myproject}/git-hooks/*
+for hook_path in ../../git-hooks/*
 do
   if [ "${hook_path##*.}" != "py" ]  # Ignore .py files
   then
