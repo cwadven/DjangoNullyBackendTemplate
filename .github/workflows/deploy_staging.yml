@@ -1,0 +1,62 @@
+name: Staging Deploy
+
+env:
+  DJANGO_SETTINGS_MODULE: config.settings.production
+
+on:
+  push:
+    branches: [ development ]
+
+jobs:
+  build:
+    runs-on: self-hosted
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.TOKEN }}
+
+    - name: Set Safe Directory
+      run: |
+        export HOME=$GITHUB_WORKSPACE
+        git config --global --add safe.directory "${{ secrets.DEVELOPMENT_PROJECT_FILE_PATH }}"
+
+    - name: Pull Development Branch
+      run: |
+        cd ${{ secrets.DEVELOPMENT_PROJECT_FILE_PATH }} && sudo git pull origin development
+
+    - name: pip Update
+      run: |
+        . ${{ secrets.DEVELOPMENT_PROJECT_FILE_PATH }}/venv/bin/activate && pip install -r ${{ secrets.DEVELOPMENT_PROJECT_FILE_PATH }}/requirements.txt
+
+    - name: Collectstatic
+      run: |
+        . ${{ secrets.DEVELOPMENT_PROJECT_FILE_PATH }}/venv/bin/activate && python ${{ secrets.DEVELOPMENT_PROJECT_FILE_PATH }}/manage.py collectstatic --noinput
+
+    - name: Database Update
+      run: |
+        . ${{ secrets.DEVELOPMENT_PROJECT_FILE_PATH }}/venv/bin/activate && python ${{ secrets.DEVELOPMENT_PROJECT_FILE_PATH }}/manage.py migrate --noinput
+      continue-on-error: true
+
+    - name: cronjob command update
+      run: |
+        . ${{ secrets.DEVELOPMENT_PROJECT_FILE_PATH }}/venv/bin/activate && cd ${{ secrets.DEVELOPMENT_PROJECT_FILE_PATH }} && fab2 update-crontab
+      continue-on-error: true
+
+    - name: cronjob restart
+      run: |
+        cat ${{ secrets.DEVELOPMENT_PROJECT_FILE_PATH }}/command.cron | sudo crontab -
+        sudo /etc/init.d/cron reload
+      continue-on-error: true
+
+    - name: celery restart
+      run: |
+        sudo /etc/init.d/celeryd restart
+      continue-on-error: true
+
+    - name: Restart server
+      run: |
+        sudo systemctl restart nginx
+        sudo systemctl restart gunicorn

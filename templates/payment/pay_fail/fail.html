@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>결제 실패</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', sans-serif;
+            background-color: #f4f4f4;
+            color: #606060;
+            margin: 0;
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 1.5em;
+            color: #D32F2F; /* Red color for failure header */
+            margin-bottom: 0.5em;
+        }
+
+        main p {
+            margin-top: 0;
+            padding: 0 20px;
+            font-size: 1em;
+            line-height: 1.4;
+        }
+
+        footer {
+            margin-top: 30px;
+        }
+
+        footer button {
+            background-color: #ffffff;
+            color: #D32F2F; /* Red color to match the header */
+            padding: 10px 20px;
+            border: 2px solid #D32F2F;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        footer button:hover {
+            background-color: #D32F2F;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>결제 실패</h1>
+    </header>
+    <main>
+        <p>결제 처리 중 오류가 발생했습니다.</p>
+    </main>
+    <footer>
+        <button onclick="location.href = '/';">돌아가기</button>
+    </footer>
+</body>
+</html>

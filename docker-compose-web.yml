@@ -1,0 +1,32 @@
+# docker-compose.yml Web Applications
+
+version: '3.8'
+services:
+  nginx:
+    container_name: web_server
+    build:
+      context: .
+      dockerfile: Dockerfile-nginx
+    volumes:
+      - .:/app
+    ports:
+      - "80:80"
+
+  flower:
+    container_name: celery_monitor
+    build:
+      context: .
+      dockerfile: Dockerfile-app
+    image: mher/flower
+    command: celery -A config flower --address=0.0.0.0 --port=5555 --basic_auth=${FLOWER_USER}:${FLOWER_PASSWORD}
+    volumes:
+      - .:/app
+    ports:
+      - "5555:5555"
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings.production
+
+networks:
+  default:
+    external:
+      name: common_network

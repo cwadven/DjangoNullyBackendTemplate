@@ -1,0 +1,66 @@
+# docker-compose.yml Web Applications
+
+version: '3.8'
+services:
+  web_blue:
+    container_name: web_blue
+    build:
+      context: .
+      dockerfile: Dockerfile-app
+    command: >
+      sh -c "pip install --no-cache-dir -r requirements.txt &&
+             python manage.py migrate && 
+             python manage.py collectstatic --noinput &&
+             newrelic-admin run-program gunicorn config.wsgi:application --bind 0.0.0.0:8000"
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings.production
+      - NEW_RELIC_APP_NAME=${NEW_RELIC_APP_NAME}
+      - NEW_RELIC_LICENSE_KEY=${NEW_RELIC_LICENSE_KEY}
+
+  cron_blue:
+    container_name: cron_blue
+    build:
+      context: .
+      dockerfile: Dockerfile-app
+    volumes:
+      - .:/app
+      - cron_log:/tmp
+    depends_on:
+      - web_blue
+    command: >
+      sh -c "pip install --no-cache-dir -r requirements.txt &&
+                   dos2unix command.cron &&
+                   chmod 0644 command.cron &&
+                   cat command.cron | crontab - &&
+                   service cron start &&
+                   tail -f /dev/null"
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings.production
+
+  celery_blue:
+    container_name: celery_blue
+    build:
+      context: .
+      dockerfile: Dockerfile-app
+    command: >
+      sh -c "pip install --no-cache-dir -r requirements.txt &&
+             celery -A config worker -l info"
+    depends_on:
+      - web_blue
+    volumes:
+      - .:/app
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings.production
+      - CELERY_BROKER_URL=redis://redis:6379/2
+
+volumes:
+  cron_log:
+
+networks:
+  default:
+    external:
+      name: common_network

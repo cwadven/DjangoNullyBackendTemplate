@@ -1,0 +1,15 @@
+#!/bin/sh
+
+current_branch=$(git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,')
+if [ "$current_branch" = "master" ]; then
+    latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
+    version_number=${latest_tag#v}
+    IFS='.' read -r major minor patch <<< "$version_number"
+    new_patch=$((patch + 1))
+    new_version="$major.$minor.$new_patch"
+    git tag -a "$new_version" -m "New release $new_version"
+
+    echo "Created new tag $new_version on master branch"
+
+    git push origin "$new_version" --no-verify
+fi

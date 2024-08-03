@@ -1,0 +1,1003 @@
+openapi: 3.0.0
+info:
+  title: API
+  version: 1.0.0
+  description: API
+servers:
+  - url: http://127.0.0.1:8000
+paths:
+  /v1/member/login:
+    post:
+      tags:
+        - Member
+      summary: Member login
+      description: Normal Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: admin
+                password:
+                  type: string
+                  example: admin
+              required:
+                - username
+                - password
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                    example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJndWVzdF9pZCI6MSwibWVtYmVyX2lkIjoxLCJleHAiOjE3MDY3OTMzMTJ9.YoSa8QjqZ8jUUhMWHzsNTsrgMt5YmxQuey0vBwTKV6s"
+                  refresh_token:
+                    type: string
+                    example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJndWVzdF9pZCI6MSwibWVtYmVyX2lkIjoxLCJleHAiOjE3MDczOTA5MTJ9.8l9dcqj63c1RJfE8Bkb2X_eqs4TCn7qcAxI3PvjeqP4"
+        '400':
+          description: | 
+            Login failed<br>
+            [ error_code ENUM ]<br>
+            missing-mandatory-parameter<br>
+            invalid-username-or-password<br>
+            [ errors ENUM ]<br>
+            username<br>
+            password<br>
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/member/social-login:
+    post:
+      tags:
+        - Member
+      summary: Member social login
+      description: Social Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - provider
+                - token
+              properties:
+                provider:
+                  type: integer
+                  enum: [2, 3, 4]  # 2: KAKAO, 3: NAVER, 4: GOOGLE
+                  example: 2
+                token:
+                  type: string
+                  example: "gyYwO9GsLD30O1T7Sg"
+      responses:
+        '200':
+          description: Social login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                    example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJndWVzdF9pZCI6MSwibWVtYmVyX2lkIjoxLCJleHAiOjE3MDY3OTMzMTJ9.YoSa8QjqZ8jUUhMWHzsNTsrgMt5YmxQuey0vBwTKV6s"
+                  refresh_token:
+                    type: string
+                    example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJndWVzdF9pZCI6MSwibWVtYmVyX2lkIjoxLCJleHAiOjE3MDczOTA5MTJ9.8l9dcqj63c1RJfE8Bkb2X_eqs4TCn7qcAxI3PvjeqP4"
+        '400':
+          description: | 
+            Social Login failed<br>
+            [ error_code ENUM ]<br>
+            missing-mandatory-parameter<br>
+            social-token-error<br>
+            [ errors ENUM ]<br>
+            provider<br>
+            token<br>
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/member/social-sign-up:
+    post:
+      tags:
+        - Member
+      summary: Member social signup
+      description: Social signup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - provider
+                - token
+                - jobs_info
+              properties:
+                provider:
+                  type: integer
+                  enum: [2, 3, 4]  # 2: KAKAO, 3: NAVER, 4: GOOGLE
+                  example: 2
+                token:
+                  type: string
+                  example: "gyYwO9GsLD30O1T7Sg"
+                jobs_info:
+                  type: array
+                  nullable: true
+                  items:
+                    type: object
+                    properties:
+                      job_id:
+                        type: integer
+                        example: 1
+                      start_date:
+                        type: string
+                        example: '2024-05-01'
+                      end_date:
+                        type: string
+                        nullable: true
+                        example: '2024-06-30'
+
+      responses:
+        '200':
+          description: Social signup successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                    example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJndWVzdF9pZCI6MSwibWVtYmVyX2lkIjoxLCJleHAiOjE3MDY3OTMzMTJ9.YoSa8QjqZ8jUUhMWHzsNTsrgMt5YmxQuey0vBwTKV6s"
+                  refresh_token:
+                    type: string
+                    example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJndWVzdF9pZCI6MSwibWVtYmVyX2lkIjoxLCJleHAiOjE3MDczOTA5MTJ9.8l9dcqj63c1RJfE8Bkb2X_eqs4TCn7qcAxI3PvjeqP4"
+        '400':
+          description: | 
+            Social Login failed<br>
+            [ error_code ENUM ]<br>
+            missing-mandatory-parameter<br>
+            social-token-error<br>
+            [ errors ENUM ]<br>
+            provider<br>
+            token<br>
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/member/refresh-token:
+    post:
+      tags:
+        - Member
+      summary: Refresh access token
+      description: Refreshes the access token using a refresh token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - refresh_token
+              properties:
+                refresh_token:
+                  type: string
+                  example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJndWVzdF9pZCI6MSwibWVtYmVyX2lkIjoxLCJleHAiOjE3MDczOTI1NTZ9.PVuMlaXns3mUW9QYWuD1qa0Et66i1A0RgLby78hs90c"
+      responses:
+        '200':
+          description: Token refreshed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                    example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJndWVzdF9pZCI6MSwibWVtYmVyX2lkIjoxLCJleHAiOjE3MDY3OTQ5NTZ9.u9aHwyOhd_7arlbDGgmo-2j9LqKU3WK7VH5P0A6Q5C8"
+                  refresh_token:
+                    type: string
+                    example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJndWVzdF9pZCI6MSwibWVtYmVyX2lkIjoxLCJleHAiOjE3MDczOTI1NTZ9.PVuMlaXns3mUW9QYWuD1qa0Et66i1A0RgLby78hs90c"
+        '400':
+          description: | 
+            Refresh Token failed<br>
+            [ error_code ENUM ]<br>
+            missing-mandatory-parameter<br>
+            [ errors ENUM ]<br>
+            refresh_token<br>
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+        '401':
+          description: | 
+            Social Login failed<br>
+            [ error_code ENUM ]<br>
+            invalid-refresh-token<br>
+            [ errors ENUM ]<br>
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/member/guest-token:
+    post:
+      tags:
+        - Member
+      summary: Generate guest token
+      description: Generates a new access token and refresh token for a guest user
+      responses:
+        '200':
+          description: Tokens generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                    example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJndWVzdF9pZCI6NCwibWVtYmVyX2lkIjpudWxsLCJleHAiOjE3MDY3OTU0MDJ9.OrdHI8qt6bVx343K6yg5wqmHSfGZ_c_t4GKFPdJ3Khg"
+                  refresh_token:
+                    type: string
+                    example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJndWVzdF9pZCI6NCwibWVtYmVyX2lkIjpudWxsLCJleHAiOjE3MDczOTMwMDJ9.TJw6jktUuwWmgsc1MBmAtNKe15ASsLzJ4pgPNGtQX3g"
+
+  /v1/member/sign-up-validation:
+    post:
+      tags:
+        - Member
+      summary: Validate user registration information
+      description: Validates the given user registration information for uniqueness and conformity.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - email
+                - nickname
+                - password1
+                - password2
+              properties:
+                username:
+                  type: string
+                  example: "test"
+                email:
+                  type: string
+                  format: email
+                  example: "test@naver.com"
+                nickname:
+                  type: string
+                  example: "test"
+                password1:
+                  type: string
+                  example: "testtest"
+                password2:
+                  type: string
+                  example: "testtest"
+      responses:
+        '200':
+          description: Validation successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "success"
+        '400':
+          description: | 
+            SignUp Validation failed<br>
+            [ error_code ENUM ]<br>
+            missing-mandatory-parameter<br>
+            invalid-sign-up-field-value<br>
+            [ errors ENUM ]<br>
+            username<br>
+            email<br>
+            nickname<br>
+            password1<br>
+            password2<br>
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/member/sign-up-check:
+    post:
+      tags:
+        - Member
+      summary: Send verification code to email
+      description: Validates user input and sends a verification code to the user's email if the input is valid.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - username
+                - nickname
+                - password2
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: "test@naver.com"
+                username:
+                  type: string
+                  example: "username"
+                nickname:
+                  type: string
+                  example: "nickname"
+                password2:
+                  type: string
+                  example: "password2"
+      responses:
+        '200':
+          description: Verification code sent successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "인증번호를 이메일로 전송했습니다."
+
+        '400':
+          description: | 
+            Error sending verification code or invalid input<br>
+            [ error_code ENUM ]<br>
+            missing-mandatory-parameter<br>
+            sending-email-token-error<br>
+            [ errors ENUM ]<br>
+            email<br>
+            username<br>
+            nickname<br>
+            password1<br>
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/member/sign-up-validate-token:
+    post:
+      tags:
+        - Member
+      summary: Validate one-time token for email verification
+      description: Validates the one-time token sent to the user's email as part of the registration process.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - one_time_token
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: "test@naver.com"
+                one_time_token:
+                  type: string
+                  example: "one_time_token"
+      responses:
+        '200':
+          description: Registration successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "회원가입에 성공했습니다."
+        '400':
+          description: | 
+            Validation error or registration failure<br>
+            [ error_code ENUM ]<br>
+            missing-mandatory-parameter<br>
+            member-creation-fail<br>
+            email-token-macro-error<br>
+            invalid-email-token<br>
+            email-token-expired<br>
+            [ errors ENUM ]<br>
+            email<br>
+            one_time_token<br>
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/product/point:
+    get:
+      tags:
+        - Product
+      summary: List points products with pagination
+      description: Retrieve a paginated list of points products.
+      parameters:
+        - in: query
+          name: page
+          required: true
+          schema:
+            type: integer
+            default: 1
+          description: Page number of the product listing.
+        - in: query
+          name: size
+          required: true
+          schema:
+            type: integer
+            default: 20
+          description: Number of products per page.
+      responses:
+        '200':
+          description: A list of points products
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  products:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        product_id:
+                          type: integer
+                          example: 1
+                        product_type:
+                          type: string
+                          example: "POINT"
+                        title:
+                          type: string
+                          example: "G-point 1000"
+                        description:
+                          type: string
+                          example: "G-point 1000"
+                        price:
+                          type: integer
+                          example: 1000
+                        point:
+                          type: integer
+                          example: 1000
+                        is_sold_out:
+                          type: boolean
+                          example: false
+                        bought_count:
+                          type: integer
+                          example: 0
+                        review_count:
+                          type: integer
+                          example: 0
+                        review_rate:
+                          type: number
+                          format: float
+                          example: 0.0
+
+  /v1/payment/product/buy/kakao:
+    post:
+      tags:
+        - Kakao Payment
+      summary: Purchase a product using Kakao Pay
+      description: Initiates a product purchase transaction using Kakao Pay.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - product_id
+                - product_type
+                - quantity
+                - payment_type
+                - order_phone_number
+              properties:
+                product_id:
+                  type: integer
+                  example: 1
+                product_type:
+                  type: string
+                  enum: [POINT]
+                  example: "POINT"
+                quantity:
+                  type: integer
+                  example: 10
+                payment_type:
+                  type: string
+                  enum: [KAKAO]
+                  example: "KAKAO"
+                order_phone_number:
+                  type: string
+                  example: "01074686889"
+      responses:
+        '200':
+          description: Purchase initiated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tid:
+                    type: string
+                    example: "T5bef4ed1c025b0f886f"
+                  next_redirect_app_url:
+                    type: string
+                    example: "https://online-pay.kakao.com/mockup/v1/1061874fa483485aeaf2f25cc35faf7651fafc55fb5aedccbc5a3b38f2639146/aInfo"
+                  next_redirect_mobile_url:
+                    type: string
+                    example: "https://online-pay.kakao.com/mockup/v1/1061874fa483485aeaf2f25cc35faf7651fafc55fb5aedccbc5a3b38f2639146/mInfo"
+                  next_redirect_pc_url:
+                    type: string
+                    example: "https://online-pay.kakao.com/mockup/v1/1061874fa483485aeaf2f25cc35faf7651fafc55fb5aedccbc5a3b38f2639146/info"
+        '400':
+          description: Error due to invalid input or token format
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                invalid_token_format:
+                  value:
+                    message: "잘못된 토큰 형식입니다."
+                invalid_input:
+                  value:
+                    message: "입력값을 다시 확인해주세요."
+
+  /v1/payment/product/approve/kakao/{order_id}:
+    get:
+      tags:
+        - Kakao Payment
+      summary: Approve Kakao Pay payment
+      description: Finalizes the payment process for an order using Kakao Pay.
+      parameters:
+        - in: path
+          name: order_id
+          required: true
+          schema:
+            type: string
+          description: The order ID to be approved.
+        - in: query
+          name: pg_token
+          required: true
+          schema:
+            type: string
+          description: The pg_token obtained from Kakao Pay.
+      responses:
+        '200':
+          description: Payment approved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "결제가 완료되었습니다."
+        '400':
+          description: Error due to invalid order or payment failure
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                non_existent_order:
+                  value:
+                    message: "존재하지 않는 주문입니다"
+                payment_failure:
+                  value:
+                    message: "카카오페이 결제에 실패하였습니다."
+
+  /v1/payment/product/cancel/kakao/{order_token}:
+    post:
+      tags:
+        - Kakao Payment
+      summary: Cancel Kakao Pay payment
+      description: Cancels a payment process for an order using Kakao Pay.
+      parameters:
+        - in: path
+          name: order_token
+          required: true
+          schema:
+            type: string
+          description: The order token of the payment to be canceled.
+      responses:
+        '200':
+          description: Payment canceled successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "결제가 취소되었습니다."
+        '400':
+          description: Error due to invalid input or other issues
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                invalid_input:
+                  value:
+                    message: "입력값을 다시 확인해주세요."
+                non_existent_order:
+                  value:
+                    message: "존재하지 않는 주문입니다."
+                already_cancelled:
+                  value:
+                    message: "이미 취소된 주문입니다."
+                invalid_order_state:
+                  value:
+                    message: "주문의 상태가 유효하지 않습니다."
+                kakao_pay_cancellation_failure:
+                  value:
+                    message: "카카오페이 결제 취소에 실패하였습니다."
+
+  /v1/common/health-check:
+    get:
+      tags:
+        - Common
+      summary: Health Check API
+      description: To check health check
+      responses:
+        '200':
+          description: Health Check successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "OK"
+
+  /v1/common/image/{constance_type}/{transaction_pk}/url:
+    post:
+      tags:
+        - Common
+      summary: Give Presigned Url
+      description: To upadte aws S3 image
+      parameters:
+        - in: path
+          name: constance_type
+          required: true
+          schema:
+            type: string
+            enum: ['member-image']
+          description: Type of constance_type
+        - in: path
+          name: transaction_pk
+          required: true
+          schema:
+            type: string
+          description: Type of constance_type pk
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - file_name
+              properties:
+                file_name:
+                  type: string
+                  description: '파일 이름 확장자까지 필요'
+                  example: 'test.png'
+      responses:
+        '200':
+          description: Created Presigned URL
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    example: "https://s3-bucket-url.com"
+                  data:
+                    type: object
+                    properties:
+                      key:
+                        type: string
+                        example: "project-image/1/test.png"
+                      x-amz-algorithm:
+                        type: string
+                        example: "AWS4-HMAC-SHA256"
+                      x-amz-credential:
+                        type: string
+                        example: "......./20240720/ap-northeast-2/s3/aws4_request"
+                      x-amz-date:
+                        type: string
+                        example: "20240720T054525Z"
+                      policy:
+                        type: string
+                        example: "eyJleHBpcmF0aW9uIjogIjIwMjQtMDctMjBUMDY6MDI6MDVaIiwgImNvbmRpdGlvbnMiOiBbWyJjb250ZW50LWxlbmd0aC1yYW5nZSIsIDAsIDEwNDg1NzYwXSwgeyJidWNrZXQiOiAic2lwbGUtZGV2In0sIHsia2V5IjogInByb2plY3QtaW1hZ2UvMS90ZXN0LnBuZyJ9LCB7IngtYW16LWFsZ29yaXRobSI6ICJBV1M0LUhNQUMtU0hBMjU2In0sIHsieC1hbXotY3JlZGVudGlhbCI6ICJBS0lBMlVDM0ZHUTZaNU5NUkJZUS8yMDI0MDcyMC9hcC1ub3J0aGVhc3QtMi9zMy9hd3M0X3JlcXVlc3QifSwgeyJ4LWFtei1kYXRlIjogIjIwMjQwNzIwVDA1NDUyNVoifV19"
+                      x-amz-signature:
+                        type: string
+                        example: "11a8ebd3d1b1c404c48d686727e96f1b6689906f87e89442487aa31db4b4b3eb"
+        '401':
+          description: No Auth
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotUserAuthPermission'
+
+  /v1/common/{constance_type}/type:
+    get:
+      tags:
+        - Common
+      summary: Get constance type
+      description: Get constance type
+      parameters:
+        - in: path
+          name: constance_type
+          required: true
+          schema:
+            type: string
+            enum: ['']
+          description: Type of constance_type
+      responses:
+        '200':
+          description: Health Check successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonConstanceTypeItemsResponse'
+
+  /v1/payment/product/fail/kakao/{order_token}:
+    post:
+      tags:
+        - Kakao Payment
+      summary: Simulate Kakao Pay payment failure
+      description: Marks a payment process as failed for an order using Kakao Pay.
+      parameters:
+        - in: path
+          name: order_token
+          required: true
+          schema:
+            type: string
+          description: The order token of the payment to mark as failed.
+      responses:
+        '200':
+          description: Payment marked as failed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "결제가 실패되었습니다."
+        '400':
+          description: Error due to invalid input or non-existent order
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                invalid_input:
+                  value:
+                    message: "입력값을 다시 확인해주세요."
+                non_existent_order:
+                  value:
+                    message: "존재하지 않는 주문입니다."
+
+  /v1/promotion/banners:
+    get:
+      tags:
+        - Promotion
+      summary: Get promotion banners
+      operationId: getPromotionBanners
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+          description: Page number of the banner list.
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+          description: Number of banners per page.
+        - name: target_layer
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - HOME_TOP
+          description: The target layer of the banners to retrieve.
+      responses:
+        '200':
+          description: A list of promotion banners.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  banners:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        banner_id:
+                          type: integer
+                          nullable: false
+                        title:
+                          type: string
+                          nullable: true
+                        title_font_color:
+                          type: string
+                          nullable: true
+                        description:
+                          type: string
+                          nullable: true
+                        description_font_color:
+                          type: string
+                          nullable: true
+                        background_color:
+                          type: string
+                          nullable: true
+                        big_image:
+                          type: string
+                          nullable: true
+                        middle_image:
+                          type: string
+                          nullable: true
+                        small_image:
+                          type: string
+                          nullable: true
+                        action_page:
+                          type: string
+                          nullable: true
+                        target_pk:
+                          type: string
+                          nullable: true
+                        target_type:
+                          type: string
+                          nullable: true
+                        external_target_url:
+                          type: string
+                          nullable: true
+                        tags:
+                          type: array
+                          items:
+                            type: string
+              examples:
+                example-1:
+                  value: {
+                    "banners": [
+                      {
+                        "banner_id": 1,
+                        "title": "Example Banner Title",
+                        "title_font_color": "#FFFFFF",
+                        "description": "Example Description",
+                        "description_font_color": "#EEEEEE",
+                        "background_color": "#000000",
+                        "big_image": "https://example.com/big_image.jpg",
+                        "middle_image": "https://example.com/middle_image.jpg",
+                        "small_image": "https://example.com/small_image.jpg",
+                        "action_page": "https://example.com/action_page",
+                        "target_pk": "123",
+                        "target_type": "Product",
+                        "external_target_url": "https://example.com/external_url",
+                        "tags": ["test_tag"]
+                      }
+                    ]
+                  }
+        '400':
+          description: Bad request, missing or invalid parameters.
+          content:
+            application/json:
+              examples:
+                missing_target_layer:
+                  value: {"message": "입력값을 다시 확인해주세요."}
+                invalid_target_layer:
+                  value: {"message": "잘못된 target_layer 입니다."}
+
+components:
+  schemas:
+    NotUserAuthPermission:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: '오류 메시지'
+          example: '로그인 후 이용해주세요.'
+
+    CommonConstanceTypeItemsResponse:
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommonConstanceTypeItem'
+
+    CommonConstanceTypeItem:
+      type: object
+      required:
+        - id
+        - name
+        - display_name
+      properties:
+        id:
+          type: integer
+          description: type pk
+          example: 1
+        name:
+          type: string
+          description: searching for wording
+          example: Frontend
+        display_name:
+          type: string
+          description: What user will see
+          example: '프론트엔더'
+
+    ErrorResponse:
+      type: object
+      required:
+        - message
+        - error_code
+        - errors
+      properties:
+        message:
+          type: string
+          description: "큰 에러 범주"
+          example: "유효하지 않은 입력값입니다."
+        error_code:
+          type: string
+          description: "큰 에러 코드"
+          example: "invalid-username-or-password"
+        errors:
+          type: object
+          nullable: true
+          description: |
+            "에러의 디테일한 문제점<br>"
+          additionalProperties:
+            type: array
+            items:
+              type: string
+          example:
+            어떠한필드정보1:
+              - "어떠한 필드1 입력값을 확인해주세요."
+            어떠한필드정보2:
+              - "어떠한 필드2 입력값을 확인해주세요."

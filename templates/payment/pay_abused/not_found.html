@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>결제 오류</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', sans-serif;
+            background-color: #f4f4f4;
+            color: #606060;
+            margin: 0;
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 1.5em;
+            color: #607D8B; /* Blue-grey color for 404 header */
+            margin-bottom: 0.5em;
+        }
+
+        main p {
+            margin-top: 0;
+            padding: 0 20px;
+            font-size: 1em;
+            line-height: 1.4;
+        }
+
+        footer {
+            margin-top: 30px;
+        }
+
+        footer button {
+            background-color: #ffffff;
+            color: #607D8B; /* Blue-grey color to match the header */
+            padding: 10px 20px;
+            border: 2px solid #607D8B;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        footer button:hover {
+            background-color: #607D8B;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>페이지를 찾을 수 없습니다</h1>
+    </header>
+    <main>
+        <p>요청하신 페이지를 찾을 수 없습니다. URL을 확인하거나 메인 페이지로 돌아가 주세요.</p>
+    </main>
+    <footer>
+        <button onclick="location.href = '/';">메인 페이지로 돌아가기</button>
+    </footer>
+</body>
+</html>
