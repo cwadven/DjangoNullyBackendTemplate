@@ -25,6 +25,7 @@ def generate_env(c):
         'KAKAO_PAY_SECRET_KEY': _get_or_set_environment('KAKAO_PAY_SECRET_KEY'),
         'NAVER_API_KEY': _get_or_set_environment('NAVER_API_KEY'),
         'NAVER_SECRET_KEY': _get_or_set_environment('NAVER_SECRET_KEY'),
+        'NAVER_REDIRECT_URL': _get_or_set_environment('NAVER_REDIRECT_URL'),
         'GOOGLE_CLIENT_ID': _get_or_set_environment('GOOGLE_CLIENT_ID'),
         'GOOGLE_SECRET_KEY': _get_or_set_environment('GOOGLE_SECRET_KEY'),
         'GOOGLE_REDIRECT_URL': _get_or_set_environment('GOOGLE_REDIRECT_URL'),
