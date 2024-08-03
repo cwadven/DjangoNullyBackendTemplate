@@ -8,13 +8,13 @@ import requests
 from botocore.exceptions import NoCredentialsError
 from common.common_utils.s3_utils import (
     generate_pre_signed_url_info,
-    upload_file_to_presigned_url,
+    upload_file_to_pre_signed_url,
 )
 from django.conf import settings
 from django.test import TestCase
 
 
-class TestGeneratePresignedURLInfo(TestCase):
+class TestGeneratePreSignedURLInfo(TestCase):
     @patch('common.common_utils.s3_utils.boto3.client')
     def test_generate_pre_signed_url_info(self, mock_boto3_client):
         # Given: Set up the test data
@@ -74,12 +74,12 @@ class TestGeneratePresignedURLInfo(TestCase):
             generate_pre_signed_url_info(file_name, _type, unique, expires_in)
 
 
-class TestUploadFileToPresignedURL(unittest.TestCase):
+class TestUploadFileToPreSignedURL(unittest.TestCase):
     @patch('common.common_utils.s3_utils.requests.post')
-    def test_upload_file_to_presigned_url(self, mock_requests_post):
+    def test_upload_file_to_pre_signed_url(self, mock_requests_post):
         # Given: Set up the test data
-        presigned_url = 'https://example.com/upload'
-        presigned_data = {'key': 'value'}
+        pre_signed_url = 'https://example.com/upload'
+        pre_signed_data = {'key': 'value'}
         file_data = b'file_content'
 
         # Mock the requests.post method
@@ -88,12 +88,12 @@ class TestUploadFileToPresignedURL(unittest.TestCase):
         mock_requests_post.return_value = mock_response
 
         # When: Call the function
-        result = upload_file_to_presigned_url(presigned_url, presigned_data, file_data)
+        result = upload_file_to_pre_signed_url(pre_signed_url, pre_signed_data, file_data)
 
         # Then: Assert that requests.post is called with the correct data
         mock_requests_post.assert_called_once_with(
-            url=presigned_url,
-            data=presigned_data,
+            url=pre_signed_url,
+            data=pre_signed_data,
             files={'file': file_data}
         )
 
@@ -101,14 +101,14 @@ class TestUploadFileToPresignedURL(unittest.TestCase):
         self.assertTrue(result)
 
     @patch('common.common_utils.s3_utils.requests.post', side_effect=requests.exceptions.RequestException())
-    def test_upload_file_to_presigned_url_with_exception(self, mock_requests_post):
+    def test_upload_file_to_pre_signed_url_with_exception(self, mock_requests_post):
         # Given: Set up the test data
-        presigned_url = 'https://example.com/upload'
-        presigned_data = {'key': 'value'}
+        pre_signed_url = 'https://example.com/upload'
+        pre_signed_data = {'key': 'value'}
         file_data = b'file_content'
 
         # When: Call the function and expect an exception
-        result = upload_file_to_presigned_url(presigned_url, presigned_data, file_data)
+        result = upload_file_to_pre_signed_url(pre_signed_url, pre_signed_data, file_data)
 
         # Then: Assert that the function returns False when an exception occurs
         self.assertFalse(result)

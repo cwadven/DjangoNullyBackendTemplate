@@ -40,11 +40,11 @@ def generate_pre_signed_url_info(
         raise Exception(e)
 
 
-def upload_file_to_presigned_url(presined_url: str, presigned_data: dict, file: bytes) -> int:
+def upload_file_to_pre_signed_url(pre_signed_url: str, pre_signed_data: dict, file: bytes) -> int:
     try:
         response = requests.post(
-            url=presined_url,
-            data=presigned_data,
+            url=pre_signed_url,
+            data=pre_signed_data,
             files={'file': file},
         )
         return response.status_code == 204
