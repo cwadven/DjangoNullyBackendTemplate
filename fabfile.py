@@ -43,7 +43,7 @@ def generate_env(c):
             'port': int(_get_or_set_environment('CACHEOPS_REDIS_PORT')),
             'db': int(_get_or_set_environment('CACHEOPS_REDIS_DB')),
         },
-        'CACHEOPS': _get_or_set_environment('CACHEOPS'),
+        'CACHEOPS': {},
         'CACHES_LOCATION': _get_or_set_environment('CACHES_LOCATION'),
         'DATABASE': {
             'ENGINE': _get_or_set_environment('DB_ENGINE'),
@@ -67,7 +67,7 @@ def generate_env(c):
         'CRONTAB_PREFIX_COMMAND': _get_or_set_environment('CRONTAB_PREFIX_COMMAND'),
         'OPENAI_API_KEY': _get_or_set_environment('OPENAI_API_KEY'),
         'SENTRY_DSN': _get_or_set_environment('SENTRY_DSN'),
-        'SENTRY_ENV': _get_or_set_environment('SENTRY_ENV').lower() if _get_or_set_environment('SENTRY_DSN') else None,
+        'SENTRY_ENV': _get_or_set_environment('SENTRY_ENV').lower() if os.environ.get('SENTRY_DSN') else None,
     }
 
     with open(env_file_path, 'w', encoding='utf-8') as f:
