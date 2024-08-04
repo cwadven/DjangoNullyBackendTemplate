@@ -93,8 +93,3 @@ NICKNAME_MAX_LENGTH = 8
 
 PASSWORD_MIN_LENGTH = 8
 PASSWORD_MAX_LENGTH = 30
-
-
-class MemberAttributeAcquisitionStatus(StrValueLabel):
-    RECEIVED = ('RECEIVED', '습득')
-    REVOKED = ('REVOKED', '회수')
