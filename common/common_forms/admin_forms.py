@@ -15,6 +15,9 @@ class PreSignedUrlAdminForm(forms.ModelForm):
     target_field_by_image_field key: The field name in the form for the image file upload.
     target_field_by_image_field value: The field name in the model for the image URL.
     upload_image_type: The type of image upload to folder of S3. Default is 'common'.
+    boto_client: boto3 client for S3.
+    upload_bucket_name: S3 bucket name.
+    cloud_front_domain: CloudFront domain for the URL. Optional.
 
     examples:
     class XXXXForm(PreSignedUrlAdminForm):
@@ -27,6 +30,9 @@ class PreSignedUrlAdminForm(forms.ModelForm):
                 'main_image_file': 'main_image_url'
             }
             upload_image_type = 'xxxx_main_image'
+            boto_client = boto3.client(...)
+            upload_bucket_name = 'bucket_name'
+            cloud_front_domain = 'cloud_front_domain'  # Optional, if you want to use
     """
     def __init__(self, *args, **kwargs):
         super(PreSignedUrlAdminForm, self).__init__(*args, **kwargs)
@@ -34,6 +40,14 @@ class PreSignedUrlAdminForm(forms.ModelForm):
         if not target_field_by_image_field:
             raise Exception(
                 'When using PreSignedUrlAdminForm need to define "Meta" class with "target_field_by_image_field."'
+            )
+        if not self._get_boto_client():
+            raise Exception(
+                'When using PreSignedUrlAdminForm need to define "Meta" class with "boto_client."'
+            )
+        if not self._get_upload_bucket_name():
+            raise Exception(
+                'When using PreSignedUrlAdminForm need to define "Meta" class with "upload_bucket_name."'
             )
         for key, target_field in target_field_by_image_field.items():
             if not isinstance(self.fields.get(key), forms.ImageField):
@@ -50,17 +64,39 @@ class PreSignedUrlAdminForm(forms.ModelForm):
     def _get_upload_image_type(self):
         return getattr(self._get_meta(), 'upload_image_type', 'common')
 
+    def _get_boto_client(self):
+        return getattr(self._get_meta(), 'boto_client', None)
+
+    def _get_upload_bucket_name(self):
+        return getattr(self._get_meta(), 'upload_bucket_name', None)
+
+    def _get_cloud_front_domain(self):
+        return getattr(self._get_meta(), 'cloud_front_domain', None)
+
     def save(self, commit=True):
         instance = super(PreSignedUrlAdminForm, self).save(commit=False)
+        boto_client = self._get_boto_client()
+        upload_bucket_name = self._get_upload_bucket_name()
+        cloud_front_domain = self._get_cloud_front_domain()
         for key, value in self._get_target_field_by_image_field().items():
             if self.cleaned_data[key]:
                 response = generate_pre_signed_url_info(
+                    boto_client,
+                    upload_bucket_name,
                     self.cleaned_data[key].name,
                     _type=self._get_upload_image_type(),
                     unique=str(instance.id) if instance.id else '0'
                 )
-                upload_file_to_pre_signed_url(response['url'], response['fields'], self.cleaned_data[key].file)
-                setattr(instance, value, response['url'] + response['fields']['key'])
+                upload_file_to_pre_signed_url(
+                    response['url'],
+                    response['fields'],
+                    self.cleaned_data[key].file,
+                )
+                if cloud_front_domain:
+                    url = cloud_front_domain + '/'
+                else:
+                    url = response['url']
+                setattr(instance, value, url + response['fields']['key'])
         if commit:
             instance.save()
         return instance
