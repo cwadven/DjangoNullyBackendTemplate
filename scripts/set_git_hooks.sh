@@ -1,10 +1,9 @@
-# create symbolic link
 for hook_path in git-hooks/*
 do
   if [ "${hook_path##*.}" != "py" ]  # Ignore .py files
   then
     # Create symbolic links inside .git/hooks/ directory
-    ln -s ../../$hook_path .git/hooks/
+    ln -sf ../../$hook_path .git/hooks/
   fi
 done
 
