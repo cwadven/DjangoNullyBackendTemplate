@@ -1,0 +1,144 @@
+version: '3.6'
+
+services:
+  # Blue Environment
+  app-blue:
+    container_name: app-blue
+    build:
+      context: .
+      dockerfile: Dockerfile-app
+    environment:
+      - APP_ENV=blue
+      - DJANGO_SETTINGS_MODULE=config.settings.production
+    volumes:
+      - .:/app
+    ports:
+      - "8081:8081"
+    networks:
+      - app-network
+    depends_on:
+      - db
+      - redis
+    command: >
+      sh -c "pip install --no-cache-dir -r requirements.txt &&
+             python manage.py migrate && 
+             python manage.py collectstatic --noinput &&
+             gunicorn config.wsgi:application --bind 0.0.0.0:8081"
+
+  # Green Environment
+  app-green:
+    container_name: app-green
+    build:
+      context: .
+      dockerfile: Dockerfile-app
+    environment:
+      - APP_ENV=green
+      - DJANGO_SETTINGS_MODULE=config.settings.production
+    volumes:
+      - .:/app
+    ports:
+      - "8082:8082"
+    networks:
+      - app-network
+    depends_on:
+      - db
+      - redis
+    command: >
+      sh -c "pip install --no-cache-dir -r requirements.txt &&
+             python manage.py migrate && 
+             python manage.py collectstatic --noinput &&
+             gunicorn config.wsgi:application --bind 0.0.0.0:8082"
+
+  # Cron job service (for scheduled tasks)
+  cron-app:
+    container_name: cron-app
+    build:
+      context: .
+      dockerfile: Dockerfile-app
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings.production
+    volumes:
+      - .:/app
+    networks:
+      - app-network
+    depends_on:
+      - db
+      - redis
+    command: >
+      sh -c "pip install --no-cache-dir -r requirements.txt &&
+             dos2unix command.cron &&
+             chmod 0644 command.cron &&
+             cat command.cron | crontab - &&
+             cron -f
+
+  # Nginx for load balancing between Blue and Green
+  nginx:
+    container_name: nginx
+    build:
+      context: .
+      dockerfile: Dockerfile-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    networks:
+      - app-network
+
+  # PostgreSQL Database
+  db:
+    container_name: postgresql14
+    image: postgres:14
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      TZ: Asia/Seoul
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+    tty: true
+    logging:
+      options:
+        max-file: "7"
+        max-size: "5m"
+
+  # PgAdmin for managing the database
+  pgadmin:
+    container_name: pg_admin
+    image: dpage/pgadmin4
+    restart: unless-stopped
+    ports:
+      - "5557:80"
+    networks:
+      - app-network
+    volumes:
+      - ./pgadmin:/var/lib/pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      TZ: Asia/Seoul
+    depends_on:
+      - db
+
+  # Redis cache server
+  redis:
+    container_name: redis
+    image: redis:latest
+    volumes:
+      - redis_data:/data
+    networks:
+      - app-network
+    ports:
+      - "6379:6379"
+    tty: true
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
