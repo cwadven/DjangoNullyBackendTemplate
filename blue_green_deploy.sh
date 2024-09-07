@@ -6,7 +6,7 @@ APP_BLUE_RUNNING=$(docker ps --filter "name=app-blue" --format "{{.Names}}")
 APP_GREEN_RUNNING=$(docker ps --filter "name=app-green" --format "{{.Names}}")
 
 # app-blue 또는 app-green 중 하나라도 실행 중이지 않으면 둘 다 실행
-if [ -z "$APP_BLUE_RUNNING" ] || [ -z "$APP_GREEN_RUNNING" ]; then
+if [ -z "$APP_BLUE_RUNNING" ] && [ -z "$APP_GREEN_RUNNING" ]; then
     echo "app-blue 또는 app-green이 실행 중이지 않습니다. 둘 다 실행합니다."
 
     docker-compose up -d app-blue  # app-blue 컨테이너 시작
@@ -44,15 +44,17 @@ if [ -z "$NGINX_CONTAINER" ]; then
 fi
 
 # 현재 사용 중인 환경을 확인
-CURRENT_ENV=$(docker exec nginx cat etc/nginx/conf.d/default.conf | grep proxy_pass | grep -o 'blue\|green')
+CURRENT_ENV=$(docker exec nginx cat etc/nginx/nginx.conf | grep server | grep -o 'blue\|green')
 
 # 트래픽을 전환할 새로운 환경 설정
 if [ "$CURRENT_ENV" == "blue" ]; then
     NEW_ENV="green"
     NEW_PORT="8082"
+    CURRENT_PORT="8081"
 else
     NEW_ENV="blue"
     NEW_PORT="8081"
+    CURRENT_PORT="8082"
 fi
 
 echo "현재 환경: $CURRENT_ENV, 새 환경: $NEW_ENV"
@@ -76,7 +78,8 @@ done
 
 if [ "$HEALTHY" = true ]; then
     # Nginx 설정 파일을 업데이트하여 트래픽을 새 환경으로 전환
-    sed -i "s#http://${CURRENT_ENV}_app#http://${NEW_ENV}_app#g" nginx.conf
+    sed -i "s/app-${CURRENT_ENV}/app-${NEW_ENV}/" nginx.conf
+    sed -i "s/${CURRENT_PORT}/${NEW_PORT}/" nginx.conf
     docker exec nginx nginx -s reload
     echo "트래픽이 $NEW_ENV 환경으로 전환되었습니다."
 
