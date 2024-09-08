@@ -1,21 +1,19 @@
 version: '3.6'
 
 services:
-  # Blue Environment
-  app-blue:
-    container_name: app-blue
+  web-app:
+    container_name: web-app
     build:
       context: .
       dockerfile: Dockerfile-app
     environment:
-      - APP_ENV=blue
       - DJANGO_SETTINGS_MODULE=config.settings.production
     volumes:
       - .:/app
       - staticfiles:/app/static
       - mediafiles:/app/media
     ports:
-      - "8081:8081"
+      - "8000:8000"
     networks:
       - app-network
     depends_on:
@@ -25,33 +23,7 @@ services:
       sh -c "pip install --no-cache-dir -r requirements.txt &&
              python manage.py migrate && 
              python manage.py collectstatic --noinput &&
-             gunicorn config.wsgi:application --bind 0.0.0.0:8081"
-
-  # Green Environment
-  app-green:
-    container_name: app-green
-    build:
-      context: .
-      dockerfile: Dockerfile-app
-    environment:
-      - APP_ENV=green
-      - DJANGO_SETTINGS_MODULE=config.settings.production
-    volumes:
-      - .:/app
-      - staticfiles:/app/static
-      - mediafiles:/app/media
-    ports:
-      - "8082:8082"
-    networks:
-      - app-network
-    depends_on:
-      - db
-      - redis
-    command: >
-      sh -c "pip install --no-cache-dir -r requirements.txt &&
-             python manage.py migrate && 
-             python manage.py collectstatic --noinput &&
-             gunicorn config.wsgi:application --bind 0.0.0.0:8082"
+             gunicorn config.wsgi:application --bind 0.0.0.0:8000 --access-logfile /var/log/gunicorn/access.log --error-logfile /var/log/gunicorn/error.log"
 
   # Cron job service (for scheduled tasks)
   cron-app:
