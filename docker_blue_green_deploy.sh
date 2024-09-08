@@ -116,6 +116,6 @@ else
     docker exec cron-app sh -c "dos2unix command.cron"
     docker exec cron-app sh -c "chmod 0644 command.cron"
     docker exec cron-app sh -c "cat command.cron | crontab -"
-    docker exec cron-app sh -c "cron -f"
+    docker exec cron-app sh -c "service cron restart"
     echo "Cron 작업이 업데이트되었습니다."
 fi
