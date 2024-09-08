@@ -76,7 +76,8 @@ services:
              dos2unix command.cron &&
              chmod 0644 command.cron &&
              cat command.cron | crontab - &&
-             cron -f"
+             service cron start &&
+             tail -f /dev/null"
 
   # Nginx for load balancing between Blue and Green
   nginx:

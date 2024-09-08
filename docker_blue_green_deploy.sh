@@ -68,6 +68,8 @@ for i in $(seq 1 $RE_TRY)
 do
     STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:$NEW_PORT)
     if [ "$STATUS_CODE" == "200" ]; then
+        docker exec app-${CURRENT_ENV} sh -c "celery -A config control shutdown"
+        docker exec app-${NEW_ENV} sh -c "celery -A config worker --loglevel=info -D"
         HEALTHY=true
         break
     fi

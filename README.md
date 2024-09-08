@@ -111,7 +111,7 @@ You can get it here: https://console.cloud.google.com/apis/credentials
 ----------------------------------------
 Channels uses Redis as a channel layer.
 
-"CHANNEL_HOST" Example: 127.0.0.1
+"CHANNEL_HOST" Example: 127.0.0.1 (if you use docker, you need to set docker container name example 'redis')
 "CHANNEL_PORT" Example: 6379
 ----------------------------------------
 
@@ -122,7 +122,7 @@ Channels uses Redis as a channel layer.
 Celery uses Redis as a message broker.
 Need to install Redis: https://redis.io/
 
-"CELERY_BROKER_URL" Example: redis://localhost:6379/2
+"CELERY_BROKER_URL" Example: redis://localhost:6379/2  (if you use docker, you need to set docker container name example 'redis')
 "result_backend" Example: redis://localhost:6379/2
 ----------------------------------------
 
@@ -133,7 +133,7 @@ Need to install Redis: https://redis.io/
 ----------------------------------------
 Cacheops uses Redis as a cache.
 
-"CACHEOPS_REDIS_HOST" Example: localhost
+"CACHEOPS_REDIS_HOST" Example: localhost  (if you use docker, you need to set docker container name example 'redis')
 "CACHEOPS_REDIS_PORT" Example: 6379
 "CACHEOPS_REDIS_DB" Example: 10
 (redis db number)
@@ -144,7 +144,7 @@ Cacheops uses Redis as a cache.
 ----------------------------------------
 Cache uses location.
 
-"CACHES_LOCATION" Example: redis://localhost:6379/1
+"CACHES_LOCATION" Example: redis://localhost:6379/1  (if you use docker, you need to set docker container name example 'redis')
 ----------------------------------------
 
 -----------------10----------------------
