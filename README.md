@@ -162,7 +162,7 @@ Database settings.
 "DB_NAME" Example: nully
 "DB_USER" Example: postgres
 "DB_PASSWORD" Example: postgres
-"DB_HOST" Example: localhost
+"DB_HOST" Example: localhost  (if you use docker, you need to set docker container name 'postgresql14')
 "DB_PORT" Example: 5432
 "DB_TEST_NAME" Example: nully_test
 ----------------------------------------
@@ -195,8 +195,6 @@ AWS settings.
 -----------------13---------------------
 - Input CRONTAB_PREFIX_COMMAND:
 ----------------------------------------
-AWS settings.
-
 "CRONTAB_PREFIX_COMMAND" 
 Example:
 source venv/bin/activate && python manage.py
@@ -308,11 +306,6 @@ fab2 generate-env
 
 ### 2. `docker-compose.yml` file change `environment` for your `DJANGO_SETTINGS_MODULE`
 
-### 3. create `temp_static` from root directory
-```shell
-mkdir temp_static
-```
-
 ### 3. Run docker-compose
 
 Create `.env` file at root directory
@@ -341,6 +334,7 @@ Create `.env` file at root directory
 # 3.
 # Run deploy script
 chmod +x ./docker_blue_green_deploy.sh
+./docker_blue_green_deploy.sh
 ```
 
 ### 4. Set CRON setting
