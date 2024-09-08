@@ -5,9 +5,8 @@
 APP_BLUE_RUNNING=$(docker ps --filter "name=app-blue" --format "{{.Names}}")
 APP_GREEN_RUNNING=$(docker ps --filter "name=app-green" --format "{{.Names}}")
 
-# app-blue 또는 app-green 중 하나라도 실행 중이지 않으면 둘 다 실행
 if [ -z "$APP_BLUE_RUNNING" ] && [ -z "$APP_GREEN_RUNNING" ]; then
-    echo "app-blue 또는 app-green이 실행 중이지 않습니다. 둘 다 실행합니다."
+    echo "app-blue 와 app-green이 실행 중이지 않습니다. 최초 둘 다 실행합니다."
 
     docker-compose up -d app-blue  # app-blue 컨테이너 시작
     sleep 10  # 컨테이너가 완전히 시작될 시간을 줌
