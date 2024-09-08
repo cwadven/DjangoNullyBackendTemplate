@@ -72,10 +72,32 @@ services:
       - redis
     command: >
       sh -c "pip install --no-cache-dir -r requirements.txt &&
+             fab2 update-crontab &&
              dos2unix command.cron &&
              chmod 0644 command.cron &&
              cat command.cron | crontab - &&
              cron -f"
+
+  # Celery worker service
+  celery-worker:
+      container_name: celery-worker
+      build:
+        context: .
+        dockerfile: Dockerfile-app
+      environment:
+        - DJANGO_SETTINGS_MODULE=config.settings.production
+      volumes:
+        - .:/app
+        - staticfiles:/app/static
+        - mediafiles:/app/media
+      networks:
+        - app-network
+      depends_on:
+        - db
+        - redis
+      command: >
+        sh -c "pip install --no-cache-dir -r requirements.txt &&
+               celery -A config worker --loglevel=info"
 
   # Nginx for load balancing between Blue and Green
   nginx:

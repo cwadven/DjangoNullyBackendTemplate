@@ -88,3 +88,26 @@ else
     echo "새 환경이 정상적으로 준비되지 않았습니다. 배포를 중단합니다."
     exit 1
 fi
+
+
+CRON_APP_RUNNING=$(docker ps --filter "name=cron-app" --format "{{.Names}}")
+
+if [ -z "$CRON_APP_RUNNING" ]; then
+    echo "Cron 컨테이너가 실행 중이지 않습니다. Cron 컨테이너를 시작합니다."
+    docker-compose up -d cron-app  # Cron 컨테이너 시작
+    sleep 10  # 컨테이너가 완전히 시작될 시간을 줌
+
+    # Cron 컨테이너가 제대로 시작되지 않았는지 다시 확인
+    CRON_APP_RUNNING=$(docker ps --filter "name=cron-app" --format "{{.Names}}")
+    if [ -z "$CRON_APP_RUNNING" ]; then
+        echo "Error: Cron 컨테이너를 시작하지 못했습니다. 스크립트를 종료합니다."
+        exit 1
+    fi
+else
+    docker exec cron-app /bin/sh -c "fab2 update-crontab"
+    docker exec cron-app /bin/sh -c "dos2unix command.cron"
+    docker exec cron-app /bin/sh -c "chmod 0644 command.cron"
+    docker exec cron-app /bin/sh -c "cat command.cron | crontab -"
+    docker exec cron-app /bin/sh -c "cron -f"
+    echo "Cron 작업이 업데이트되었습니다."
+fi
