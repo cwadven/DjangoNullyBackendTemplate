@@ -35,9 +35,6 @@ source venv/Scripts/activate
 # Linux
 source venv/bin/activate
 
-# Create a temp_static directory at root directory
-mkdir temp_static
-
 # Install the requirements
 pip install -r requirements.txt
 
@@ -317,6 +314,9 @@ mkdir temp_static
 ```
 
 ### 3. Run docker-compose
+
+Create `.env` file at root directory
+
 ```shell
 # 1.
 # Before you start, you need set .env and .django_env files at root directory
@@ -340,31 +340,7 @@ mkdir temp_static
 
 # 3.
 # Run deploy script
-chmod +x ./docker_hard_deploy.sh
-chmod +x ./docker_soft_deploy.sh
-
-# 4.
-# Before you start, you need check if newrelic is set if not then remove newrelic from docker-compose.yml
-# [docker-compose-app-blue.yml]
-# - Delete below line
-# newrelic-admin run-program gunicorn config.wsgi:application --bind 0.0.0.0:8000
-# - Then add below line
-# gunicorn config.wsgi:application --bind 0.0.0.0:8000
-
-# [docker-compose-app-green.yml]
-# - Delete below line
-# newrelic-admin run-program gunicorn config.wsgi:application --bind 0.0.0.0:8001
-# - Then add below line
-# gunicorn config.wsgi:application --bind 0.0.0.0:8001
-
-# 5.
-# Run deploy script (hard deploy)
-# Meaning, it will --build all docker containers and images
-./docker_hard_deploy.sh
-
-# Run deploy script (soft deploy)
-# Meaning, it will not --build all docker containers and images
-./docker_soft_deploy.sh
+chmod +x ./docker_blue_green_deploy.sh
 ```
 
 ### 4. Set CRON setting
