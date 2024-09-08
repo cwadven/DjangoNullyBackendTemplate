@@ -9,4 +9,6 @@ done
 
 # Give permission to execute the hooks in the .git/hooks/ directory
 chmod +x .git/hooks/pre-commit
+echo "Git hooks 'pre-commit' set successfully!"
 chmod +x .git/hooks/pre-push
+echo "Git hooks 'pre-push' set successfully!"

@@ -374,5 +374,6 @@ tail -f /tmp/log/django_commands.log
 ```
 cd project_root
 
+chmod +x ./scripts/set_git_hooks.sh
 ./scripts/set_git_hooks.sh
 ```
