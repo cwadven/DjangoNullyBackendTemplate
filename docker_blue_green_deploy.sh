@@ -77,9 +77,17 @@ done
 
 if [ "$HEALTHY" = true ]; then
     # Nginx 설정 파일을 업데이트하여 트래픽을 새 환경으로 전환
-    sed -i "s/app-${CURRENT_ENV}/app-${NEW_ENV}/" nginx.conf
-    sed -i "s/${CURRENT_PORT}/${NEW_PORT}/" nginx.conf
-    docker exec nginx nginx -s reload
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+      # macOS의 경우
+      sed -i '' "s/app-${CURRENT_ENV}/app-${NEW_ENV}/g" nginx.conf
+      sed -i '' "s/${CURRENT_PORT}/${NEW_PORT}/" nginx.conf
+    else
+      # Linux의 경우
+      sed -i "s/app-${CURRENT_ENV}/app-${NEW_ENV}/g" nginx.conf
+      sed -i "s/${CURRENT_PORT}/${NEW_PORT}/" nginx.conf
+    fi
+
+    docker exec nginx sh -c "nginx -s reload"
     echo "트래픽이 $NEW_ENV 환경으로 전환되었습니다."
 
     # 이전 환경의 컨테이너를 종료
@@ -104,10 +112,10 @@ if [ -z "$CRON_APP_RUNNING" ]; then
         exit 1
     fi
 else
-    docker exec cron-app /bin/sh -c "fab2 update-crontab"
-    docker exec cron-app /bin/sh -c "dos2unix command.cron"
-    docker exec cron-app /bin/sh -c "chmod 0644 command.cron"
-    docker exec cron-app /bin/sh -c "cat command.cron | crontab -"
-    docker exec cron-app /bin/sh -c "cron -f"
+    docker exec cron-app sh -c "fab2 update-crontab"
+    docker exec cron-app sh -c "dos2unix command.cron"
+    docker exec cron-app sh -c "chmod 0644 command.cron"
+    docker exec cron-app sh -c "cat command.cron | crontab -"
+    docker exec cron-app sh -c "cron -f"
     echo "Cron 작업이 업데이트되었습니다."
 fi
