@@ -28,6 +28,7 @@ THIRD_APPS = [
     'corsheaders',
     'django_celery_results',
     'cacheops',
+    'constance',
 ]
 
 PROJECT_APPS = [
@@ -215,3 +216,10 @@ KAKAO_PAY_BASE_DOMAIN = 'http://127.0.0.1:8000'
 CSRF_COOKIE_SECURE = False
 
 SESSION_COOKIE_SECURE = False
+
+CONSTANCE_IGNORE_ADMIN_VERSION_CHECK = True
+CONSTANCE_FILE_ROOT = 'constance'
+
+CONSTANCE_ADDITIONAL_FIELDS = {
+    'image_field': ['django.forms.ImageField', {}]
+}
