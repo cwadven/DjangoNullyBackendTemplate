@@ -54,6 +54,10 @@ class PreSignedUrlAdminForm(forms.ModelForm):
                 raise TypeError(f'Need to define "{key}" by ImageField in form.')
             if not hasattr(self.instance, target_field):
                 raise AttributeError(f'Are you sure "{target_field}" is defined in model?')
+            if not isinstance(self.base_fields.get(target_field), forms.Field):
+                raise AttributeError(f'Not exists "{target_field}" in form.')
+            if self.base_fields.get(target_field).required:
+                raise AttributeError(f'Cannot set "{target_field}" as required in form. Please reset "required=False" in form.')
 
     def _get_meta(self):
         return getattr(self, 'Meta')
