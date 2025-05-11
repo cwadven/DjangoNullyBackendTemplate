@@ -197,7 +197,7 @@ AWS settings.
 ----------------------------------------
 "CRONTAB_PREFIX_COMMAND" 
 Example:
-source venv/bin/activate && python manage.py
+cd /app && . venv/bin/activate && python manage.py
 or
 cd /app && newrelic-admin run-program python manage.py
 ----------------------------------------
