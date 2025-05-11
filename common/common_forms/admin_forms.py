@@ -8,12 +8,12 @@ from django import forms
 class PreSignedUrlAdminForm(forms.ModelForm):
     """
     Admin Form for handling pre-signed URL for image upload.
-    Need to Define ImageField 'target_field_by_image_field' of key.
+    Need to Define ImageField 'target_field_by_file_or_image_field' of key.
 
-    Need to define Meta class with 'target_field_by_image_field' and 'upload_image_type'
+    Need to define Meta class with 'target_field_by_file_or_image_field' and 'upload_image_type'
 
-    target_field_by_image_field key: The field name in the form for the image file upload.
-    target_field_by_image_field value: The field name in the model for the image URL.
+    target_field_by_file_or_image_field key: The field name in the form for the image file upload.
+    target_field_by_file_or_image_field value: The field name in the model for the image URL.
     upload_image_type: The type of image upload to folder of S3. Default is 'common'.
     boto_client: boto3 client for S3.
     upload_bucket_name: S3 bucket name.
@@ -26,7 +26,7 @@ class PreSignedUrlAdminForm(forms.ModelForm):
         class Meta:
             model = XXXX
             fields = '__all__'
-            target_field_by_image_field = {
+            target_field_by_file_or_image_field = {
                 'main_image_file': 'main_image_url'
             }
             upload_image_type = 'xxxx_main_image'
@@ -36,10 +36,10 @@ class PreSignedUrlAdminForm(forms.ModelForm):
     """
     def __init__(self, *args, **kwargs):
         super(PreSignedUrlAdminForm, self).__init__(*args, **kwargs)
-        target_field_by_image_field = self._get_target_field_by_image_field()
-        if not target_field_by_image_field:
+        target_field_by_file_or_image_field = self._get_target_field_by_file_or_image_field()
+        if not target_field_by_file_or_image_field:
             raise Exception(
-                'When using PreSignedUrlAdminForm need to define "Meta" class with "target_field_by_image_field."'
+                'When using PreSignedUrlAdminForm need to define "Meta" class with "target_field_by_file_or_image_field."'
             )
         if not self._get_boto_client():
             raise Exception(
@@ -49,8 +49,8 @@ class PreSignedUrlAdminForm(forms.ModelForm):
             raise Exception(
                 'When using PreSignedUrlAdminForm need to define "Meta" class with "upload_bucket_name."'
             )
-        for key, target_field in target_field_by_image_field.items():
-            if not isinstance(self.fields.get(key), forms.ImageField):
+        for key, target_field in target_field_by_file_or_image_field.items():
+            if not isinstance(self.fields.get(key), (forms.ImageField, forms.FileField)):
                 raise TypeError(f'Need to define "{key}" by ImageField in form.')
             if not hasattr(self.instance, target_field):
                 raise AttributeError(f'Are you sure "{target_field}" is defined in model?')
@@ -62,8 +62,8 @@ class PreSignedUrlAdminForm(forms.ModelForm):
     def _get_meta(self):
         return getattr(self, 'Meta')
 
-    def _get_target_field_by_image_field(self):
-        return getattr(self._get_meta(), 'target_field_by_image_field', {})
+    def _get_target_field_by_file_or_image_field(self):
+        return getattr(self._get_meta(), 'target_field_by_file_or_image_field', {})
 
     def _get_upload_image_type(self):
         return getattr(self._get_meta(), 'upload_image_type', 'common')
@@ -82,7 +82,7 @@ class PreSignedUrlAdminForm(forms.ModelForm):
         boto_client = self._get_boto_client()
         upload_bucket_name = self._get_upload_bucket_name()
         cloud_front_domain = self._get_cloud_front_domain()
-        for key, value in self._get_target_field_by_image_field().items():
+        for key, value in self._get_target_field_by_file_or_image_field().items():
             if self.cleaned_data[key]:
                 response = generate_pre_signed_url_info(
                     boto_client,
