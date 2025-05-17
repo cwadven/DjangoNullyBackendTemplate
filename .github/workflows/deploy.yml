@@ -1,49 +1,103 @@
-#name: CI/CD
-#
-#env:
-#  DJANGO_SETTINGS_MODULE: config.settings.production
-#
-#on:
-#  push:
-#    branches: [ master ]
-#
-#jobs:
-#  build:
-#    runs-on: self-hosted
-#
-#    steps:
-#    - uses: actions/checkout@v3
-#      with:
-#        ref: ${{ github.event.pull_request.head.sha }}
-#      env:
-#        GITHUB_TOKEN: ${{ secrets.TOKEN }}
-#    - name: Pull Master Branch
-#      run: |
-#        cd /var/www/ProjectName/ && sudo git pull origin master
-#
-#    - name: pip Update
-#      run: |
-#        . /var/www/ProjectName/venv/bin/activate && pip install -r /var/www/ProjectName/requirements.txt
-#    - name: Collectstatic
-#      run: |
-#        . /var/www/ProjectName/venv/bin/activate && python /var/www/ProjectName/manage.py collectstatic --noinput
-#    - name: Database Update
-#      run: |
-#        . /var/www/ProjectName/venv/bin/activate && python /var/www/ProjectName/manage.py migrate --noinput
-#      continue-on-error: true
-#    - name: TestCase
-#      run: |
-#        cd /var/www/ProjectName && . /var/www/ProjectName/venv/bin/activate && python /var/www/ProjectName/manage.py test --noinput
-#    - name: cronjob restart
-#      run: |
-#        cat /var/www/ProjectName/command.cron | sudo crontab -
-#        sudo /etc/init.d/cron reload
-#      continue-on-error: true
-#    - name: celery restart
-#      run: |
-#        sudo /etc/init.d/celeryd restart
-#      continue-on-error: true
-#    - name: Restart server
-#      run: |
-#        sudo systemctl restart nginx
-#        sudo systemctl restart uwsgi
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      deployment-type:
+        type: choice
+        description: 'Which server to deployment type'
+        required: true
+        default: 'production'
+        options:
+          - production
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checkout:
+    runs-on: self-hosted
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.ref }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.TOKEN }}
+
+  setup-git:
+    needs: checkout
+    runs-on: self-hosted
+    steps:
+    - name: Set Safe Directory
+      run: |
+        git config --global --add safe.directory "${{ secrets.PRODUCTION_PROJECT_FILE_PATH }}"
+
+  pull-code:
+    needs: setup-git
+    runs-on: self-hosted
+    steps:
+    - name: Pull Branch
+      run: |
+        cd ${{ secrets.PRODUCTION_PROJECT_FILE_PATH }} && sudo git pull origin ${{ github.ref }}
+
+  update-dependencies:
+    needs: pull-code
+    runs-on: self-hosted
+    steps:
+    - name: pip Update
+      run: |
+        . ${{ secrets.PRODUCTION_PROJECT_FILE_PATH }}/venv/bin/activate && pip install -r ${{ secrets.PRODUCTION_PROJECT_FILE_PATH }}/requirements.txt
+
+  collect-static:
+    needs: update-dependencies
+    runs-on: self-hosted
+    steps:
+    - name: Collectstatic
+      run: |
+        . ${{ secrets.PRODUCTION_PROJECT_FILE_PATH }}/venv/bin/activate && python ${{ secrets.PRODUCTION_PROJECT_FILE_PATH }}/manage.py collectstatic --noinput
+
+  database-migrate:
+    needs: collect-static
+    runs-on: self-hosted
+    steps:
+    - name: Database Update
+      run: |
+        . ${{ secrets.PRODUCTION_PROJECT_FILE_PATH }}/venv/bin/activate && python ${{ secrets.PRODUCTION_PROJECT_FILE_PATH }}/manage.py migrate --noinput
+
+  update-cron:
+    needs: database-migrate
+    runs-on: self-hosted
+    steps:
+    - name: cronjob command update
+      run: |
+        . ${{ secrets.PRODUCTION_PROJECT_FILE_PATH }}/venv/bin/activate && cd ${{ secrets.PRODUCTION_PROJECT_FILE_PATH }} && fab2 update-crontab
+      continue-on-error: true
+
+  restart-cron:
+    needs: update-cron
+    runs-on: self-hosted
+    steps:
+    - name: cronjob restart
+      run: |
+        cat ${{ secrets.PRODUCTION_PROJECT_FILE_PATH }}/command.cron | sudo crontab -
+        sudo /etc/init.d/cron reload
+      continue-on-error: true
+
+  restart-celery:
+    needs: restart-cron
+    runs-on: self-hosted
+    steps:
+    - name: celery restart
+      run: |
+        sudo /etc/init.d/celeryd restart
+      continue-on-error: true
+
+  restart-web-server:
+    needs: restart-celery
+    runs-on: self-hosted
+    steps:
+    - name: Restart web server
+      run: |
+        sudo systemctl restart nginx
+        sudo systemctl restart gunicorn
