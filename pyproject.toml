@@ -38,7 +38,8 @@ dependencies = [
     "google-auth-httplib2 (>=0.2.0,<0.3.0)",
     "django-constance[redis] (>=4.3.2,<5.0.0)",
     "isort (>=6.0.1,<7.0.0)",
-    "black (>=25.1.0,<26.0.0)"
+    "black (>=25.1.0,<26.0.0)",
+    "drf-yasg (>=1.21.10,<2.0.0)"
 ]
 
 

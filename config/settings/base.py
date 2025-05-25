@@ -29,6 +29,7 @@ THIRD_APPS = [
     'django_celery_results',
     'cacheops',
     'constance',
+    'drf_yasg',
 ]
 
 PROJECT_APPS = [
