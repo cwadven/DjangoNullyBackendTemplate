@@ -12,7 +12,7 @@ Nully's Django Backend API Template
 
 ## Requirements
 
-![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54) Version 3.11 <br>
+![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54) Version 3.12 <br>
 ![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white) Version 14 (Docker file based) <br>
 ![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white) (Celery, Cache) <br>
 ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white) (Optional) <br>
@@ -22,6 +22,8 @@ Nully's Django Backend API Template
 ![GitHub Actions](https://img.shields.io/badge/github%20actions-%232671E5.svg?style=for-the-badge&logo=githubactions&logoColor=white) <br>
 
 ## Getting Started
+
+### Version: `venv`
 
 ```shell
 # Clone the repository
@@ -37,7 +39,81 @@ source venv/bin/activate
 
 # Install the requirements
 pip install -r requirements.txt
+```
 
+### Version `pyenv`
+
+#### Mac
+
+```shell
+# Install
+brew install pyenv
+
+# Setting
+export PATH="$HOME/.pyenv/bin:$PATH"
+eval "$(pyenv init --path)"
+eval "$(pyenv init -)"
+
+# First Define Python Version
+cd to/project/root
+pyenv install 3.12.3
+pyenv local 3.12.3
+```
+
+#### Ubuntu/Debian
+
+```shell
+# Install
+sudo apt update
+sudo apt install -y make build-essential libssl-dev zlib1g-dev \
+libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm \
+libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
+
+curl https://pyenv.run | bash
+
+# Setting
+export PATH="$HOME/.pyenv/bin:$PATH"
+eval "$(pyenv init --path)"
+eval "$(pyenv init -)"
+
+# First Define Python Version
+cd to/project/root
+pyenv install 3.12.3
+pyenv local 3.12.3
+```
+
+#### Windows
+
+```shell  
+# Go to Link and check What you have to do
+https://github.com/pyenv-win/pyenv-win/blob/master/docs/installation.md#powershell
+
+# First Define Python Version
+cd to/project/root
+pyenv install 3.12.3
+pyenv local 3.12.3
+```
+
+### Poetry
+
+#### Windows
+
+```shell
+# Install
+(Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | python -
+
+poetry init
+poetry env use $(pyenv which python)
+poetry install
+poetry env activate
+
+poetry run python manage.py migrate
+poetry run python manage.py runserver
+```
+
+## Defining Settings ENV
+
+```shell
 # Define .django_env file
 fab2 generate-env
 
@@ -235,9 +311,11 @@ export DJANGO_SETTINGS_MODULE=XXXX.settings.local
 
 # Migrate the database
 python manage.py migrate
+# poetry run python manage.py migrate
 
 # Run the server
 python manage.py runserver
+# poetry run python manage.py runserver
 
 # Run the celery worker
 celery -A config worker -l INFO -P solo
@@ -246,8 +324,17 @@ celery -A config worker -l INFO -P solo
 ## Testing
 
 Local Testing
+
+### Version: `venv`
+
 ```shell
 python manage test --keepdb
+```
+
+### Version: `pyenv` + `peotry`
+
+```shell
+poetry run python manage test --keepdb
 ```
 
 ## CI/CD Setting
@@ -299,9 +386,17 @@ By Local
 ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
 ### 1. Set env file
 
+
+### Version: `venv`
+
 ```shell
--- Set .django_env file
 fab2 generate-env
+```
+
+### Version: `pyenv` + `peotry`
+
+```shell
+poetry run fab2 generate-env
 ```
 
 ### 2. `docker-compose.yml` file change `environment` for your `DJANGO_SETTINGS_MODULE`
