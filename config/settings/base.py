@@ -79,7 +79,10 @@ AUTH_USER_MODEL = 'member.Member'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [
+            BASE_DIR / 'templates',
+            BASE_DIR / 'docs',
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -223,4 +226,11 @@ CONSTANCE_FILE_ROOT = 'constance'
 
 CONSTANCE_ADDITIONAL_FIELDS = {
     'image_field': ['django.forms.ImageField', {}]
+}
+
+SWAGGER_SETTINGS = {
+    'USE_SESSION_AUTH': False,
+    'SECURITY_DEFINITIONS': None,
+    'VALIDATOR_URL': None,
+    'SPEC_URL': '/swagger.yaml',
 }
