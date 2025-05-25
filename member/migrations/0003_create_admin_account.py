@@ -5,14 +5,26 @@ from django.db import migrations
 
 def forward(apps, schema_editor):
     Member = apps.get_model('member', 'Member')
+    MemberProvider = apps.get_model('member', 'MemberProvider')
+    MemberStatus = apps.get_model('member', 'MemberStatus')
+    MemberType = apps.get_model('member', 'MemberType')
+    email_provider = MemberProvider.objects.get(
+        name='email',
+    )
+    normal_member_status = MemberStatus.objects.get(
+        name='정상',
+    )
+    admin_member_type = MemberType.objects.get(
+        name='관리자',
+    )
     member = Member.objects.create_superuser(
         username='admin',
         email='admin@admin.com',
         password='admin1q2w3e4r!',
     )
-    member.member_type_id = 1
-    member.member_status_id = 1
-    member.member_provider_id = 1
+    member.member_type_id = admin_member_type.id
+    member.member_status_id = normal_member_status.id
+    member.member_provider_id = email_provider.id
     member.first_name = '관'
     member.last_name = '리자'
     member.nickname = 'admin'
