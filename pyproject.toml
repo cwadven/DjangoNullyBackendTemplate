@@ -1,0 +1,47 @@
+[project]
+name = "djangonullybackendtemplate"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "cwadven",email = "cwadven@naver.com"}
+]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "django (>=5.2.1,<6.0.0)",
+    "django-cors-headers (>=4.7.0,<5.0.0)",
+    "django-debug-toolbar (>=5.2.0,<6.0.0)",
+    "djangorestframework (>=3.16.0,<4.0.0)",
+    "djangorestframework-jwt (>=1.11.0,<2.0.0)",
+    "django-redis (>=5.4.0,<6.0.0)",
+    "django-cacheops (>=7.2,<8.0)",
+    "celery (>=5.5.2,<6.0.0)",
+    "django-celery-results (>=2.6.0,<3.0.0)",
+    "flower (>=2.0.1,<3.0.0)",
+    "freezegun (>=1.5.2,<2.0.0)",
+    "boto3 (>=1.38.23,<2.0.0)",
+    "fabric2 (>=3.2.2,<4.0.0)",
+    "requests (>=2.32.3,<3.0.0)",
+    "flake8 (>=7.2.0,<8.0.0)",
+    "flake8-import-order (>=0.18.2,<0.19.0)",
+    "psycopg2 (>=2.9.10,<3.0.0)",
+    "pydantic (>=2.11.5,<3.0.0)",
+    "gunicorn (>=23.0.0,<24.0.0)",
+    "botocore (>=1.38.23,<2.0.0)",
+    "cryptography (>=45.0.2,<46.0.0)",
+    "jinja2 (>=3.1.6,<4.0.0)",
+    "openai (>=1.82.0,<2.0.0)",
+    "pillow (>=11.2.1,<12.0.0)",
+    "google-api-python-client (>=2.170.0,<3.0.0)",
+    "google-auth (>=2.40.2,<3.0.0)",
+    "google-auth-oauthlib (>=1.2.2,<2.0.0)",
+    "google-auth-httplib2 (>=0.2.0,<0.3.0)",
+    "django-constance[redis] (>=4.3.2,<5.0.0)",
+    "isort (>=6.0.1,<7.0.0)",
+    "black (>=25.1.0,<26.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
