@@ -33,11 +33,12 @@ python -m venv venv
 
 # Activate the virtual environment
 # Windows
-source venv/Scripts/activate
+. venv/Scripts/activate
 # Linux
 source venv/bin/activate
 
 # Install the requirements
+python -m pip install --upgrade pip setuptools wheel
 pip install -r requirements.txt
 ```
 

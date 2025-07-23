@@ -14,7 +14,8 @@ fabric2==3.2.2
 requests==2.31.0
 flake8==6.1.0
 flake8-import-order==0.18.2
-psycopg2==2.9.8
+psycopg2-binary==2.9.10
+# psycopg2==2.9.8 mac
 pydantic==2.4.2
 pydantic_core==2.10.1
 gunicorn==21.2.0
