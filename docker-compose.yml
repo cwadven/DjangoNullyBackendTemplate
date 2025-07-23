@@ -1,6 +1,24 @@
 version: '3.6'
 
 services:
+  localstack:
+    container_name: localstack
+    image: localstack/localstack:latest
+    ports:
+      - "4566:4566"  # 모든 AWS 서비스는 이 포트 하나로 사용
+    environment:
+      - SERVICES=s3,sqs,sns
+      - DEBUG=1
+      - DATA_DIR=/tmp/localstack/data
+      - AWS_DEFAULT_REGION=ap-northeast-2
+      - HOSTNAME_EXTERNAL=localstack
+    volumes:
+      - ./localstack/init-aws.sh:/etc/localstack/init/ready.d/init-aws.sh  # 자동 리소스 생성 스크립트
+      - localstack_data:/tmp/localstack/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - app-network
+
   web-app:
     container_name: web-app
     build:
@@ -126,3 +144,4 @@ volumes:
   redis_data:
   staticfiles:
   mediafiles:
+  localstack_data:
