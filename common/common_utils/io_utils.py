@@ -1,5 +1,8 @@
 from django.conf import settings
-from django.core.mail import send_mail
+from django.core.mail import (
+    EmailMessage,
+    send_mail,
+)
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
@@ -23,3 +26,20 @@ def send_email(title: str, html_body_content: str, payload: dict, to: list) -> N
         html_message=message,
         fail_silently=False,
     )
+
+
+def send_email_with_file(title: str, html_body_content: str, payload: dict, to: list, file_path: str) -> None:
+    message = render_to_string(html_body_content, payload)
+
+    email = EmailMessage(
+        title,
+        message,
+        settings.EMAIL_HOST_USER,
+        to,
+    )
+    email.content_subtype = "html"
+
+    if file_path:
+        email.attach_file(file_path)
+
+    email.send()
