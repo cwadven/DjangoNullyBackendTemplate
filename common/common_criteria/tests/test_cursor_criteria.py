@@ -6,6 +6,7 @@ from unittest.mock import patch
 
 from common.common_criteria.cursor_criteria import CursorCriteria
 from common.common_testcase_helpers.testcase_helpers import SampleModel
+from django.db.models import Q
 from django.test import TestCase
 
 
@@ -113,4 +114,63 @@ class CursorCriteriaTests(TestCase):
         ordering_data = SampleEmptyCursorCriteria.get_ordering_data()
 
         # Then:
-        self.assertEqual(ordering_data, ['-id', '-created', 'name'])
+        self.assertEqual(len(ordering_data), 3)
+
+        # id__lt -> DESC
+        self.assertEqual(ordering_data[0].expression.name, 'id')
+        self.assertEqual(ordering_data[0].descending, True)
+        self.assertEqual(ordering_data[0].nulls_last, True)
+
+        # created__lte -> DESC
+        self.assertEqual(ordering_data[1].expression.name, 'created')
+        self.assertEqual(ordering_data[1].descending, True)
+        self.assertEqual(ordering_data[1].nulls_last, True)
+
+        # name__gt -> ASC
+        self.assertEqual(ordering_data[2].expression.name, 'name')
+        self.assertEqual(ordering_data[2].descending, False)
+        self.assertEqual(ordering_data[2].nulls_last, True)
+
+    def test_get_filter_q_builds_lexicographic_or_condition(self):
+        class SampleCriteria(CursorCriteria):
+            cursor_keys = ['consumed_at__lte', 'id__lt']
+
+        decoded = {
+            'consumed_at__lte': '2025-01-01T00:00:00+09:00',
+            'id__lt': 10,
+        }
+
+        q = SampleCriteria.get_filter_q(decoded)
+        expected = Q(consumed_at__lt='2025-01-01T00:00:00+09:00') | (
+            Q(consumed_at='2025-01-01T00:00:00+09:00') & Q(id__lt=10)
+        )
+        self.assertEqual(q, expected)
+
+    def test_get_filter_q_three_keys(self):
+        class SampleCriteria(CursorCriteria):
+            cursor_keys = [
+                'consumed_at__lte',
+                'moved_to_consumed_section_at__lte',
+                'id__lt',
+            ]
+
+        decoded = {
+            'consumed_at__lte': '2025-01-01T00:00:00+09:00',
+            'moved_to_consumed_section_at__lte': '2025-01-01T00:00:01+09:00',
+            'id__lt': 10,
+        }
+
+        q = SampleCriteria.get_filter_q(decoded)
+        expected = (
+            Q(consumed_at__lt='2025-01-01T00:00:00+09:00')
+            | (
+                Q(consumed_at='2025-01-01T00:00:00+09:00')
+                & Q(moved_to_consumed_section_at__lt='2025-01-01T00:00:01+09:00')
+            )
+            | (
+                Q(consumed_at='2025-01-01T00:00:00+09:00')
+                & Q(moved_to_consumed_section_at='2025-01-01T00:00:01+09:00')
+                & Q(id__lt=10)
+            )
+        )
+        self.assertEqual(q, expected)
